@@ -15,3 +15,5 @@ A web application that helps users discover their humor styles through a fun and
 ## Files
 
 questions.md contains a list of the questions in the humor style test.
+
+humor-types.md contains a list of humor styles
