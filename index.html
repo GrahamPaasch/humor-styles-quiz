@@ -142,13 +142,27 @@
             animation: float 4s ease-in-out infinite;
             pointer-events: none;
         }
+
+    /* Respect system reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+    /* Manual reduced motion toggle */
+    .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after {
+      animation: none !important;
+      transition: none !important;
+    }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        // Simple icon components (no external dependencies)
+  // App version (update this when making notable changes)
+  const APP_VERSION = "v0.3.0"; // update as you ship changes
+
+  // Simple icon components (no external dependencies)
         const CheckIcon = () => React.createElement('svg', {
             width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none',
             stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round'
@@ -662,6 +676,40 @@ Find your funny at: ${url}`;
                 >
                   <Share2Icon /> 📢 Share My Comedy DNA!
                 </button>
+                <div className="w-full flex flex-wrap justify-center gap-3 mt-3">
+                  <button
+                    onClick={() => {
+                      const pageUrl = encodeURIComponent(window.location.href);
+                      const text = encodeURIComponent(`I discovered my comedy DNA (Build ${APP_VERSION})! I'm a ${code.split("").join("")} — ${profile.title}! #HumorCode #HCODE`);
+                      openShare(`https://www.facebook.com/sharer/sharer.php?u=${pageUrl}&quote=${text}`);
+                    }}
+                    className="px-5 py-2 rounded-2xl bg-blue-600 text-white font-bold button-hover"
+                    title="Share on Facebook"
+                  >
+                    Share on Facebook
+                  </button>
+                  <button
+                    onClick={() => {
+                      const pageUrl = encodeURIComponent(window.location.href);
+                      const text = encodeURIComponent(`I discovered my comedy DNA (Build ${APP_VERSION})! I'm a ${code.split("").join("")} — ${profile.title}!`);
+                      openShare(`https://twitter.com/intent/tweet?text=${text}&url=${pageUrl}&hashtags=HumorCode,HCODE`);
+                    }}
+                    className="px-5 py-2 rounded-2xl bg-black text-white font-bold button-hover"
+                    title="Share on X/Twitter"
+                  >
+                    Share on X
+                  </button>
+                  <button
+                    onClick={() => {
+                      const pageUrl = encodeURIComponent(window.location.href);
+                      openShare(`https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`);
+                    }}
+                    className="px-5 py-2 rounded-2xl bg-sky-700 text-white font-bold button-hover"
+                    title="Share on LinkedIn"
+                  >
+                    Share on LinkedIn
+                  </button>
+                </div>
               </div>
               
               {/* Value reinforcement */}
@@ -709,6 +757,7 @@ Find your funny at: ${url}`;
           const [step, setStep] = useState("intro");
           const [answers, setAnswers] = useState({});
           const [result, setResult] = useState(null);
+          const [reducedMotion, setReducedMotion] = useState(false);
 
           const totalAnswered = Object.keys(answers).length;
 
@@ -721,12 +770,27 @@ Find your funny at: ${url}`;
             setStep("result");
           };
 
+          // helper: open share window
+          const openShare = (url) => {
+            const w = 700, h = 600;
+            const y = window.top.outerHeight / 2 + window.top.screenY - ( h / 2);
+            const x = window.top.outerWidth / 2 + window.top.screenX - ( w / 2);
+            window.open(url, '_blank', `toolbar=0,status=0,width=${w},height=${h},top=${y},left=${x}`);
+          };
+
           return (
-            <div className="min-h-screen bg-fun-gradient text-white font-fun">
+            <div className={`min-h-screen bg-fun-gradient text-white font-fun ${reducedMotion ? 'reduce-motion' : ''}`}
+                 data-app-version={APP_VERSION}>
               <div className="max-w-4xl mx-auto p-6">
                 {step === "intro" && (
                   <section className="text-center fade-in">
-                    <div className="mb-6 text-6xl float">🤣</div>
+                    <div className="mb-2 flex items-center justify-center gap-3 text-sm text-white/70">
+                      <span className="px-2 py-0.5 rounded-full bg-white/10 border border-white/20">Build {APP_VERSION}</span>
+                      <button onClick={() => setReducedMotion(r => !r)} className="px-2 py-0.5 rounded-full bg-white/10 border border-white/20 button-hover">
+                        {reducedMotion ? 'Enable Animations' : 'Reduce Motion'}
+                      </button>
+                    </div>
+                    <div className="mb-6 text-6xl float" aria-hidden="true">🤣</div>
                     <h1 className="text-6xl font-bungee tracking-tight mb-4 pulse-glow text-white drop-shadow-lg">
                       H‑CODE Humor Quiz
                     </h1>
@@ -840,7 +904,7 @@ Find your funny at: ${url}`;
                       <div className="text-6xl mb-4 float">🎊</div>
                       <h2 className="text-4xl font-bungee text-white mb-2">Your Comedy DNA Revealed! 🧬</h2>
                       <div className="text-xl font-comic text-white/90">
-                        Drumroll please... 🥁✨
+                        Drumroll please... 🥁✨ • Build {APP_VERSION}
                       </div>
                     </div>
                     <ResultView code={result.code} detail={result.detail} onRetake={() => { setAnswers({}); setResult(null); setStep("quiz"); }} />
@@ -848,7 +912,8 @@ Find your funny at: ${url}`;
                 )}
 
                 <footer className="text-center text-sm text-white/60 mt-12 pb-6 font-comic">
-                  Made with 💖 and lots of 😂 • © {new Date().getFullYear()} H‑CODE • Humor Typology • Keep laughing! 🎉
+                  Build {APP_VERSION} • When sharing feedback, please include the build number. 🙏
+                  <div className="mt-1">Made with 💖 and lots of 😂 • © {new Date().getFullYear()} H‑CODE • Humor Typology</div>
                 </footer>
               </div>
             </div>
