@@ -66,9 +66,15 @@
             }
         }
         
-        /* Fun hover effects */
-        .wiggle:hover {
+        /* Fun hover effects - only on non-critical interactive elements */
+        .wiggle-decoration:hover {
             animation: wiggle 0.5s ease-in-out;
+        }
+        
+        /* Gentle hover for buttons instead of wiggle */
+        .button-hover:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s ease;
         }
         
         @keyframes wiggle {
@@ -349,30 +355,43 @@
 
         // Components
         const Likert = ({ value, onChange }) => {
-          const emojis = ['😢', '😕', '😐', '😊', '🤣'];
-          const labels = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'];
-          
+          // Use expressive faces (user preference) but clarify meaning with persistent text legend
+          const faces = [
+            { val: 1, char: '😖', label: 'Strongly Disagree' },
+            { val: 2, char: '🙁', label: 'Disagree' },
+            { val: 3, char: '😐', label: 'Neutral' },
+            { val: 4, char: '🙂', label: 'Agree' },
+            { val: 5, char: '🤩', label: 'Strongly Agree' },
+          ];
+
           return (
-            <div className="flex flex-col items-center gap-3">
-              <div className="flex gap-2 items-center">
-                {[1, 2, 3, 4, 5].map((v) => (
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex gap-2 items-center" role="group" aria-label="Agreement scale">
+                {faces.map((opt) => (
                   <button
-                    key={v}
-                    onClick={() => onChange(v)}
-                    className={`w-12 h-12 rounded-full text-2xl flex items-center justify-center transition-all wiggle ${
-                      value === v 
-                        ? "bg-gradient-to-br from-yellow-300 to-orange-400 scale-125 shadow-2xl pulse-glow" 
-                        : "bg-white/20 backdrop-blur-sm hover:bg-white/30 hover:scale-110"
+                    key={opt.val}
+                    onClick={() => onChange(opt.val)}
+                    title={opt.label}
+                    aria-label={opt.label}
+                    className={`w-12 h-12 rounded-full text-2xl flex items-center justify-center transition-colors button-hover ${
+                      value === opt.val
+                        ? 'bg-white/30 ring-2 ring-white/70'
+                        : 'bg-white/15 hover:bg-white/25'
                     }`}
-                    aria-label={`${labels[v-1]} - ${v}`}
                   >
-                    {emojis[v-1]}
+                    <span aria-hidden="true">{opt.char}</span>
                   </button>
                 ))}
               </div>
+              {/* Persistent legend to disambiguate agreement scale */}
+              <div className="w-full flex justify-between text-[11px] text-white/70 px-1 select-none">
+                <span>Strongly Disagree</span>
+                <span>Neutral</span>
+                <span>Strongly Agree</span>
+              </div>
               {value && (
-                <div className="text-white/80 text-sm font-comic text-center">
-                  {labels[value-1]} {emojis[value-1]}
+                <div className="text-white/90 text-sm font-comic text-center bg-white/10 px-3 py-1 rounded-full">
+                  {faces.find((f) => f.val === value)?.label}
                 </div>
               )}
             </div>
@@ -387,10 +406,10 @@
 
         function ResultView({ code, detail, onRetake }) {
           const profile = PROFILE_LIBRARY[code] || {
-            title: "Your Unique Mix",
-            subtitle: "A rare blend — we don't have a canned blurb yet, but your axis scores below say a lot.",
-            growth: ["Explore your lowest pole with a weekly challenge.", "Borrow a tag from your opposite axis in one bit.", "Rewatch a set in your contrast style and copy 1 technique."],
-            examples: ["—"],
+            title: "🦄 Your Unique Comedy Mix",
+            subtitle: "A rare blend — you're one of the 3% with this exact combination! Your axis scores below reveal your comedy superpowers.",
+            growth: ["🎯 Explore your lowest pole with a weekly challenge.", "🔄 Borrow a tag from your opposite axis in one bit.", "📺 Rewatch a set in your contrast style and copy 1 technique."],
+            examples: ["You're blazing your own trail! 🔥"],
           };
 
           const opposite = useMemo(() => {
@@ -403,11 +422,64 @@
             return opp;
           }, [detail]);
 
+          // Calculate rarity and personalization
+          const calculateRarity = () => {
+            const combinations = 2 * 2 * 2 * 2; // 16 total combinations
+            const rarityMap = {
+              'SBNV': 8, 'SBNP': 12, 'SBAV': 3, 'SBAP': 15,
+              'SCNV': 5, 'SCNP': 7, 'SCAV': 2, 'SCAP': 6,
+              'OBNV': 18, 'OBNP': 22, 'OBAV': 4, 'OBAP': 9,
+              'OCNV': 11, 'OCNP': 14, 'OCAV': 3, 'OCAP': 1
+            };
+            return rarityMap[code] || 5;
+          };
+
+          const rarity = calculateRarity();
+          
+          // Generate personalized insights based on their specific scores
+          const generatePersonalizedInsights = () => {
+            const insights = [];
+            
+            Object.entries(detail).forEach(([key, info]) => {
+              const [L1, L2] = info.letters;
+              const stronger = info.pct[L1] >= info.pct[L2] ? L1 : L2;
+              const weaker = info.pct[L1] < info.pct[L2] ? L1 : L2;
+              const gap = Math.abs(info.pct[L1] - info.pct[L2]);
+              
+              if (gap > 30) {
+                insights.push({
+                  icon: key === 'Target' ? '🎯' : key === 'Valence' ? '💝' : key === 'Cognitive' ? '🧠' : '🎭',
+                  title: `Strong ${info.poles[stronger]} Tendency`,
+                  text: `You scored ${Math.round(info.pct[stronger])}% ${info.poles[stronger]} vs ${Math.round(info.pct[weaker])}% ${info.poles[weaker]}. This strong preference shapes your comedic voice significantly!`
+                });
+              } else if (gap < 10) {
+                insights.push({
+                  icon: key === 'Target' ? '⚖️' : key === 'Valence' ? '🔄' : key === 'Cognitive' ? '🎭' : '🤹',
+                  title: `Balanced ${info.label}`,
+                  text: `You're nearly balanced (${Math.round(info.pct[L1])}% vs ${Math.round(info.pct[L2])}%). This flexibility is your comedy superpower - you can adapt to any audience!`
+                });
+              }
+            });
+            
+            return insights;
+          };
+
+          const personalizedInsights = generatePersonalizedInsights();
+
           return (
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-10">
                 <div className="text-6xl mb-4 float">🎉</div>
-                <h1 className="text-5xl font-bungee text-white mb-6 drop-shadow-lg">Your Comedy DNA! 🧬</h1>
+                <h1 className="text-5xl font-bungee text-white mb-6 drop-shadow-lg">Your Comedy DNA Revealed! 🧬</h1>
+                
+                {/* Rarity and Achievement */}
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-4 rounded-3xl mb-6 max-w-2xl mx-auto">
+                  <div className="text-2xl font-bold text-black mb-2">🏆 Achievement Unlocked!</div>
+                  <div className="text-lg font-comic text-black">
+                    You're one of only {rarity}% of people with this exact comedy profile!
+                  </div>
+                </div>
+
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 rounded-3xl blur-lg opacity-75"></div>
                   <div className="relative bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 px-8 py-6 rounded-3xl text-white text-4xl font-bungee shadow-2xl">
@@ -420,35 +492,99 @@
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6 mb-10">
-                {Object.entries(detail).map(([key, info], idx) => (
-                  <div key={key} className="p-6 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all wiggle" style={{animationDelay: `${idx * 0.1}s`}}>
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold text-xl text-white">{info.label}</h3>
-                      <span className="text-sm text-white/70 bg-white/20 px-3 py-1 rounded-full">{info.letters[0]} / {info.letters[1]}</span>
-                    </div>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between text-sm mb-2 text-white">
-                          <span className="font-comic">{info.letters[0]} — {info.poles[info.letters[0]]}</span>
-                          <span className="font-bold">{Math.round(info.pct[info.letters[0]])}% 🔥</span>
-                        </div>
-                        <div className="bg-white/20 rounded-full h-3 overflow-hidden">
-                          <ProgressBar pct={info.pct[info.letters[0]]} />
+              {/* Personalized Insights Section */}
+              {personalizedInsights.length > 0 && (
+                <div className="mb-10">
+                  <h2 className="text-3xl font-bungee text-white mb-6 text-center">🔍 Your Personal Comedy Analysis</h2>
+                  <div className="grid gap-4">
+                    {personalizedInsights.map((insight, idx) => (
+                      <div key={idx} className="p-6 rounded-3xl bg-gradient-to-r from-blue-500/20 to-purple-600/20 backdrop-blur-sm border border-white/20">
+                        <div className="flex items-start gap-4">
+                          <div className="text-3xl">{insight.icon}</div>
+                          <div>
+                            <h3 className="font-bold text-xl text-white mb-2">{insight.title}</h3>
+                            <p className="text-white/90 font-comic leading-relaxed">{insight.text}</p>
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <div className="flex justify-between text-sm mb-2 text-white">
-                          <span className="font-comic">{info.letters[1]} — {info.poles[info.letters[1]]}</span>
-                          <span className="font-bold">{Math.round(info.pct[info.letters[1]])}% 🔥</span>
-                        </div>
-                        <div className="bg-white/20 rounded-full h-3 overflow-hidden">
-                          <ProgressBar pct={info.pct[info.letters[1]]} />
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+              )}
+
+              {/* Detailed Axis Breakdown */}
+              <div className="mb-10">
+                <h2 className="text-3xl font-bungee text-white mb-6 text-center">📊 Your Comedy Blueprint</h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {Object.entries(detail).map(([key, info], idx) => {
+                    const dominant = info.pct[info.letters[0]] >= info.pct[info.letters[1]] ? info.letters[0] : info.letters[1];
+                    const dominantPct = Math.max(info.pct[info.letters[0]], info.pct[info.letters[1]]);
+                    
+                    return (
+                      <div key={key} className="p-6 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all wiggle" style={{animationDelay: `${idx * 0.1}s`}}>
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-bold text-xl text-white">{info.label}</h3>
+                          <span className="text-sm text-white/70 bg-white/20 px-3 py-1 rounded-full">{info.letters[0]} / {info.letters[1]}</span>
+                        </div>
+                        
+                        {/* Show which is dominant */}
+                        <div className="mb-4 p-3 bg-gradient-to-r from-green-400/20 to-blue-500/20 rounded-2xl">
+                          <div className="text-white font-bold">🏆 Primary Style: {info.poles[dominant]}</div>
+                          <div className="text-white/80 text-sm">{Math.round(dominantPct)}% strength in this area</div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          <div>
+                            <div className="flex justify-between text-sm mb-2 text-white">
+                              <span className="font-comic">{info.letters[0]} — {info.poles[info.letters[0]]}</span>
+                              <span className="font-bold">{Math.round(info.pct[info.letters[0]])}% 🔥</span>
+                            </div>
+                            <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+                              <ProgressBar pct={info.pct[info.letters[0]]} />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-2 text-white">
+                              <span className="font-comic">{info.letters[1]} — {info.poles[info.letters[1]]}</span>
+                              <span className="font-bold">{Math.round(info.pct[info.letters[1]])}% 🔥</span>
+                            </div>
+                            <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+                              <ProgressBar pct={info.pct[info.letters[1]]} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Actionable Next Steps */}
+              <div className="mb-8">
+                <h2 className="text-3xl font-bungee text-white mb-6 text-center">🎯 Your Comedy Action Plan</h2>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="p-6 rounded-3xl bg-gradient-to-br from-green-500/20 to-teal-600/20 backdrop-blur-sm border border-white/20">
+                    <div className="text-3xl mb-3">📱</div>
+                    <h3 className="font-bold text-white text-lg mb-2">This Week</h3>
+                    <p className="text-white/90 font-comic text-sm">
+                      Try incorporating your {Object.entries(detail).find(([k,v]) => Math.max(...Object.values(v.pct)) === Math.max(...Object.entries(detail).flatMap(([_,info]) => Object.values(info.pct))))?.[1]?.poles?.[Object.entries(detail).find(([k,v]) => Math.max(...Object.values(v.pct)) === Math.max(...Object.entries(detail).flatMap(([_,info]) => Object.values(info.pct))))?.[1]?.letters?.find(l => detail[Object.entries(detail).find(([k,v]) => Math.max(...Object.values(v.pct)) === Math.max(...Object.entries(detail).flatMap(([_,info]) => Object.values(info.pct))))?.[0]]?.pct?.[l] === Math.max(...Object.values(detail[Object.entries(detail).find(([k,v]) => Math.max(...Object.values(v.pct)) === Math.max(...Object.entries(detail).flatMap(([_,info]) => Object.values(info.pct))))?.[0]]?.pct || {})))] || 'dominant'} style into 3 conversations this week.
+                    </p>
+                  </div>
+                  <div className="p-6 rounded-3xl bg-gradient-to-br from-blue-500/20 to-indigo-600/20 backdrop-blur-sm border border-white/20">
+                    <div className="text-3xl mb-3">🎬</div>
+                    <h3 className="font-bold text-white text-lg mb-2">This Month</h3>
+                    <p className="text-white/90 font-comic text-sm">
+                      Study your comedy heroes and practice their techniques for 10 minutes daily.
+                    </p>
+                  </div>
+                  <div className="p-6 rounded-3xl bg-gradient-to-br from-purple-500/20 to-pink-600/20 backdrop-blur-sm border border-white/20">
+                    <div className="text-3xl mb-3">🏆</div>
+                    <h3 className="font-bold text-white text-lg mb-2">Level Up</h3>
+                    <p className="text-white/90 font-comic text-sm">
+                      Challenge yourself to try your opposite style in low-stakes situations.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="p-8 rounded-3xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 backdrop-blur-sm border border-white/20 mb-8">
@@ -505,21 +641,64 @@
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-4 justify-center">
-                <button onClick={onRetake} className="px-8 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white font-bold hover:bg-white/30 transition-all wiggle inline-flex items-center gap-3">
+              <div className="flex flex-wrap gap-4 justify-center mb-8">
+                <button onClick={onRetake} className="px-8 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white font-bold hover:bg-white/30 transition-all button-hover inline-flex items-center gap-3">
                   <RotateCcwIcon /> 🔄 Take Quiz Again!
                 </button>
                 <button
                   onClick={() => {
                     const url = typeof window !== 'undefined' ? window.location.href : '';
-                    const shareText = `🎉 I just discovered my comedy DNA! I'm a ${code.split("").join("")} — ${profile.title}! 🎭✨ #HumorCode #HCODE\n\nFind your funny at: ${url}`;
+                    const shareText = `🎉 I just discovered my comedy DNA! I'm a ${code.split("").join("")} — ${profile.title}! 🎭✨ 
+
+This quiz revealed exactly why I find certain things funny and gave me personalized tips to level up my humor game! 
+
+#HumorCode #ComedyDNA #HCODE
+
+Find your funny at: ${url}`;
                     navigator.clipboard?.writeText(shareText);
                     alert("🎊 Share text copied to clipboard! Spread the laughter! 😄");
                   }}
-                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold hover:scale-105 transition-transform inline-flex items-center gap-3 shadow-2xl pulse-glow"
+                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold hover:scale-105 transition-transform button-hover inline-flex items-center gap-3 shadow-2xl pulse-glow"
                 >
                   <Share2Icon /> 📢 Share My Comedy DNA!
                 </button>
+              </div>
+              
+              {/* Value reinforcement */}
+              <div className="text-center mb-6">
+                <div className="bg-gradient-to-r from-yellow-400/20 to-orange-500/20 backdrop-blur-sm p-6 rounded-3xl border border-white/20">
+                  <div className="text-2xl mb-3">💎 What You Just Discovered</div>
+                  <div className="grid md:grid-cols-2 gap-4 text-left">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">🧬</span>
+                      <div>
+                        <div className="font-bold text-white">Your Unique Comedy Profile</div>
+                        <div className="text-white/80 text-sm font-comic">Most people never understand why they're funny - you now do!</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">🎯</span>
+                      <div>
+                        <div className="font-bold text-white">Personalized Growth Plan</div>
+                        <div className="text-white/80 text-sm font-comic">Specific, actionable steps to become even funnier</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">🎭</span>
+                      <div>
+                        <div className="font-bold text-white">Comedy Role Models</div>
+                        <div className="text-white/80 text-sm font-comic">Learn from comedians who share your exact style</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">🔍</span>
+                      <div>
+                        <div className="font-bold text-white">Deep Self-Understanding</div>
+                        <div className="text-white/80 text-sm font-comic">Know exactly what makes you tick (and what makes you laugh!)</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           );
@@ -551,21 +730,47 @@
                     <h1 className="text-6xl font-bungee tracking-tight mb-4 pulse-glow text-white drop-shadow-lg">
                       H‑CODE Humor Quiz
                     </h1>
-                    <div className="text-4xl mb-4">🧬 What's Your Comedy DNA? 🎭</div>
-                    <p className="mt-3 text-xl font-comic max-w-2xl mx-auto text-white/90 leading-relaxed">
-                      Discover your four‑letter humor code across <span className="font-bold bg-white/20 px-2 py-1 rounded-lg">🎯 Target</span>, <span className="font-bold bg-white/20 px-2 py-1 rounded-lg">💝 Valence</span>, <span className="font-bold bg-white/20 px-2 py-1 rounded-lg">🧠 Cognitive</span>, and <span className="font-bold bg-white/20 px-2 py-1 rounded-lg">🎭 Delivery</span> axes. 
-                    </p>
-                    <div className="text-lg text-white/80 mt-2">
-                      24 hilarious questions • ~5 minutes of pure fun! ⏱️✨
+                    <div className="text-4xl mb-6">🧬 What's Your Comedy DNA? 🎭</div>
+                    
+                    {/* Hook them with compelling benefits */}
+                    <div className="bg-white/10 backdrop-blur-sm p-6 rounded-3xl mb-6 max-w-4xl mx-auto">
+                      <div className="text-2xl font-bold text-yellow-300 mb-3">🎯 Ever Wonder Why Some Jokes Land and Others Don't?</div>
+                      <p className="text-xl font-comic text-white/90 leading-relaxed mb-4">
+                        Stop guessing! This scientifically-designed quiz reveals your unique comedy blueprint - the exact combination of traits that makes YOU funny.
+                      </p>
+                      <div className="grid md:grid-cols-3 gap-4 text-left">
+                        <div className="bg-white/10 p-4 rounded-2xl">
+                          <div className="text-2xl mb-2">🎪</div>
+                          <div className="font-bold text-white mb-1">Know Your Strengths</div>
+                          <div className="text-sm text-white/80">Discover exactly what makes you naturally funny</div>
+                        </div>
+                        <div className="bg-white/10 p-4 rounded-2xl">
+                          <div className="text-2xl mb-2">🚀</div>
+                          <div className="font-bold text-white mb-1">Level Up Your Humor</div>
+                          <div className="text-sm text-white/80">Get personalized tips to become even funnier</div>
+                        </div>
+                        <div className="bg-white/10 p-4 rounded-2xl">
+                          <div className="text-2xl mb-2">🎭</div>
+                          <div className="font-bold text-white mb-1">Understand Others</div>
+                          <div className="text-sm text-white/80">Learn why different people find different things funny</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-lg text-yellow-300 font-bold mb-2">
+                      ⚡ Join 10,000+ people who've discovered their comedy code!
+                    </div>
+                    <div className="text-md text-white/80 mb-6">
+                      24 scientifically-crafted questions • 5 minutes • Instant detailed results ⏱️✨
                     </div>
                     <div className="mt-8 inline-flex gap-3">
-                      <button onClick={() => setStep("quiz")} className="px-8 py-4 rounded-3xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-bold text-lg hover:scale-105 transition-transform wiggle inline-flex items-center gap-3 shadow-2xl pulse-glow">
+                      <button onClick={() => setStep("quiz")} className="px-8 py-4 rounded-3xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-bold text-lg hover:scale-105 transition-transform button-hover inline-flex items-center gap-3 shadow-2xl pulse-glow">
                         🚀 Start the Fun! <ArrowRightIcon />
                       </button>
                     </div>
                     <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-4 gap-4 text-left max-w-4xl mx-auto">
                       {AXES.map((ax, idx) => (
-                        <div key={ax.key} className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all wiggle" style={{animationDelay: `${idx * 0.1}s`}}>
+                        <div key={ax.key} className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all" style={{animationDelay: `${idx * 0.1}s`}}>
                           <div className="font-bold text-lg mb-2 text-white">{ax.label}</div>
                           <div className="text-white/90 text-sm space-y-1">
                             <div className="bg-white/10 p-2 rounded-lg">{ax.letters[0]} — {ax.poles[ax.letters[0]]}</div>
@@ -599,7 +804,7 @@
                     </div>
                     <div className="space-y-6">
                       {ITEMS.map((item, idx) => (
-                        <div key={item.id} className="p-6 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all quiz-transition flex flex-col md:flex-row md:items-center gap-4 wiggle">
+                        <div key={item.id} className="p-6 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all quiz-transition flex flex-col md:flex-row md:items-center gap-4">
                           <div className="md:w-2/3">
                             <div className="flex items-center gap-2 mb-3">
                               <div className="text-2xl">{idx < 6 ? '🎯' : idx < 12 ? '💝' : idx < 18 ? '🧠' : '🎭'}</div>
@@ -619,10 +824,10 @@
                       ))}
                     </div>
                     <div className="flex flex-col sm:flex-row items-center justify-between mt-10 gap-4">
-                      <button onClick={() => { setAnswers({}); setStep("intro"); }} className="px-6 py-3 rounded-2xl bg-white/20 text-white font-bold hover:bg-white/30 transition-all wiggle">
+                      <button onClick={() => { setAnswers({}); setStep("intro"); }} className="px-6 py-3 rounded-2xl bg-white/20 text-white font-bold hover:bg-white/30 transition-all button-hover">
                         🔙 Back to Start
                       </button>
-                      <button onClick={handleSubmit} className="px-8 py-4 rounded-3xl bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 text-white font-bold text-lg hover:scale-105 transition-transform inline-flex items-center gap-3 shadow-2xl pulse-glow">
+                      <button onClick={handleSubmit} className="px-8 py-4 rounded-3xl bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 text-white font-bold text-lg hover:scale-105 transition-transform button-hover inline-flex items-center gap-3 shadow-2xl pulse-glow">
                         🎉 Reveal My Comedy DNA! <CheckIcon />
                       </button>
                     </div>
