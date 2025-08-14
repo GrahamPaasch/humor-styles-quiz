@@ -55,7 +55,7 @@ const AXES = [
 ];
 
 // Long‑form profile library (concise but expandable)
-const PROFILE_LIBRARY: Record<string, { title: string; subtitle: string; growth: string[]; examples: string[] }> = {
+const PROFILE_LIBRARY = {
   "SBNV": {
     title: "The Warm Wordsmith",
     subtitle: "Self‑deprecating, uplifting, and clever. You invite people in with wit and warmth.",
@@ -159,11 +159,11 @@ const PROFILE_LIBRARY: Record<string, { title: string; subtitle: string; growth:
 };
 
 // Helper to compute scores per axis and letters
-function computeScores(answers: Record<number, number>) {
+function computeScores(answers) {
   // Build sums per axis and pole
-  const sums: Record<string, { [pole: string]: number }> = {};
+  const sums = {};
   for (const axis of AXES) {
-    sums[axis.key] = { [axis.letters[0]]: 0, [axis.letters[1]]: 0 } as any;
+    sums[axis.key] = { [axis.letters[0]]: 0, [axis.letters[1]]: 0 };
   }
 
   ITEMS.forEach((item) => {
@@ -174,8 +174,8 @@ function computeScores(answers: Record<number, number>) {
   });
 
   // For each axis, decide letter by comparing pole sums (ties -> first letter)
-  const letters: string[] = [];
-  const detail: Record<string, any> = {};
+  const letters = [];
+  const detail = {};
   AXES.forEach((axis) => {
     const [L1, L2] = axis.letters;
     const s1 = sums[axis.key][L1] || 0;
@@ -201,7 +201,7 @@ function computeScores(answers: Record<number, number>) {
   return { code, detail };
 }
 
-const Likert = ({ value, onChange }: { value?: number; onChange: (v: number) => void }) => (
+const Likert = ({ value, onChange }) => (
   <div className="flex gap-2 items-center">
     {[1, 2, 3, 4, 5].map((v) => (
       <button
@@ -218,13 +218,13 @@ const Likert = ({ value, onChange }: { value?: number; onChange: (v: number) => 
   </div>
 );
 
-const ProgressBar = ({ pct }: { pct: number }) => (
+const ProgressBar = ({ pct }) => (
   <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
     <div className="h-3 rounded-full" style={{ width: `${pct}%` }} />
   </div>
 );
 
-function ResultView({ code, detail, onRetake }: { code: string; detail: any; onRetake: () => void }) {
+function ResultView({ code, detail, onRetake }) {
   const profile = PROFILE_LIBRARY[code] || {
     title: "Your Unique Mix",
     subtitle: "A rare blend — we don't have a canned blurb yet, but your axis scores below say a lot.",
@@ -234,7 +234,7 @@ function ResultView({ code, detail, onRetake }: { code: string; detail: any; onR
 
   const opposite = useMemo(() => {
     const opp = Object.entries(detail)
-      .map(([k, info]: any) => {
+      .map(([k, info]) => {
         const [L1, L2] = info.letters;
         // pick the *lower* pct as the opposite pole letter
         return info.pct[L1] >= info.pct[L2] ? L2 : L1;
@@ -254,7 +254,7 @@ function ResultView({ code, detail, onRetake }: { code: string; detail: any; onR
       </div>
 
       <div className="grid md:grid-cols-2 gap-6 mb-10">
-        {Object.entries(detail).map(([key, info]: any) => (
+        {Object.entries(detail).map(([key, info]) => (
           <div key={key} className="p-5 rounded-2xl border bg-white shadow-sm">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold">{info.label}</h3>
@@ -313,9 +313,9 @@ function ResultView({ code, detail, onRetake }: { code: string; detail: any; onR
 }
 
 export default function HumorCodeQuizApp() {
-  const [step, setStep] = useState<"intro" | "quiz" | "result">("intro");
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [result, setResult] = useState<{ code: string; detail: any } | null>(null);
+  const [step, setStep] = useState("intro");
+  const [answers, setAnswers] = useState({});
+  const [result, setResult] = useState(null);
 
   const totalAnswered = Object.keys(answers).length;
 

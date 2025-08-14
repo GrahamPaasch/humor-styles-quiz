@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H-CODE Humor Quiz</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Simple animations with CSS transitions instead of Framer Motion --></script>
+    
+    <style>
+        /* Custom styles for progress bars since we can't use dynamic styles easily */
+        .progress-bar {
+            transition: width 0.3s ease;
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+        }
+        
+        /* Simple fade-in animations to replace Framer Motion */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .quiz-transition {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Simple icon components (no external dependencies)
+        const CheckIcon = () => React.createElement('svg', {
+            width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none',
+            stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round'
+        }, React.createElement('path', { d: 'm9 12 2 2 4-4' }));
+
+        const ArrowRightIcon = () => React.createElement('svg', {
+            width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none',
+            stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round'
+        }, React.createElement('path', { d: 'M5 12h14' }), React.createElement('path', { d: 'l7-7 7 7-7 7' }));
+
+        const RotateCcwIcon = () => React.createElement('svg', {
+            width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none',
+            stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round'
+        }, React.createElement('path', { d: 'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8' }), React.createElement('path', { d: 'M3 3v5h5' }));
+
+        const Share2Icon = () => React.createElement('svg', {
+            width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none',
+            stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round'
+        }, React.createElement('circle', { cx: 18, cy: 5, r: 3 }), React.createElement('circle', { cx: 6, cy: 12, r: 3 }), React.createElement('circle', { cx: 18, cy: 19, r: 3 }), React.createElement('path', { d: 'M8.59 13.51l6.83 3.98' }), React.createElement('path', { d: 'M15.41 6.51l-6.82 3.98' }));
+
+        // Use React hooks
+        const { useMemo, useState, useEffect } = React;
+
+        // Your quiz data and logic (copied from your component file)
+        const ITEMS = [
+          // Axis 1 — Target Orientation (S vs O)
+          { id: 1, axis: "Target", pole: "S", text: "I often make myself the butt of the joke to make others feel comfortable." },
+          { id: 2, axis: "Target", pole: "O", text: "I'm more likely to tease others than to poke fun at myself." },
+          { id: 3, axis: "Target", pole: "S", text: "My favorite kind of humor is self‑mockery." },
+          { id: 4, axis: "Target", pole: "O", text: "I enjoy humor that takes someone else down a peg." },
+          { id: 5, axis: "Target", pole: "S", text: "Even in a roast, I'd rather roast myself than the other person." },
+          { id: 6, axis: "Target", pole: "O", text: "The funniest jokes are about other people's quirks or mistakes." },
+          // Axis 2 — Intent Valence (B vs C)
+          { id: 7, axis: "Valence", pole: "B", text: "I like humor that makes everyone feel included." },
+          { id: 8, axis: "Valence", pole: "C", text: "A sharp, cutting remark is often the funniest part of a conversation." },
+          { id: 9, axis: "Valence", pole: "B", text: "I avoid humor that could make someone feel bad, even if it's funny." },
+          { id: 10, axis: "Valence", pole: "C", text: "The best jokes have a bit of bite to them." },
+          { id: 11, axis: "Valence", pole: "B", text: "I'm drawn to gentle, uplifting humor." },
+          { id: 12, axis: "Valence", pole: "C", text: "Sarcasm is one of my favorite comedic tools." },
+          // Axis 3 — Cognitive Style (N vs A)
+          { id: 13, axis: "Cognitive", pole: "N", text: "I enjoy jokes where the punchline neatly explains the setup." },
+          { id: 14, axis: "Cognitive", pole: "A", text: "The weirder and less it makes sense, the better." },
+          { id: 15, axis: "Cognitive", pole: "N", text: "I like stories that build up to a clever twist ending." },
+          { id: 16, axis: "Cognitive", pole: "A", text: "Random, nonsensical humor cracks me up more than logical jokes." },
+          { id: 17, axis: "Cognitive", pole: "N", text: "Puns and wordplay are my kind of humor." },
+          { id: 18, axis: "Cognitive", pole: "A", text: "Humor that feels like a dream sequence is my favorite." },
+          // Axis 4 — Delivery Mode (V vs P)
+          { id: 19, axis: "Delivery", pole: "V", text: "I love clever turns of phrase and witty banter." },
+          { id: 20, axis: "Delivery", pole: "P", text: "I find visual gags and slapstick funnier than verbal jokes." },
+          { id: 21, axis: "Delivery", pole: "V", text: "A smart one‑liner can make me laugh harder than any physical stunt." },
+          { id: 22, axis: "Delivery", pole: "P", text: "A perfectly timed pratfall is comedy gold." },
+          { id: 23, axis: "Delivery", pole: "V", text: "I enjoy humor that plays with language more than sight gags." },
+          { id: 24, axis: "Delivery", pole: "P", text: "Facial expressions and body language make jokes funnier to me." },
+        ];
+
+        const AXES = [
+          { key: "Target", letters: ["S", "O"], label: "Target Orientation", poles: { S: "Self‑directed", O: "Other‑directed" } },
+          { key: "Valence", letters: ["B", "C"], label: "Intent Valence", poles: { B: "Benevolent", C: "Critical" } },
+          { key: "Cognitive", letters: ["N", "A"], label: "Cognitive Style", poles: { N: "Narrative‑Resolution", A: "Absurd‑Incongruous" } },
+          { key: "Delivery", letters: ["V", "P"], label: "Delivery Mode", poles: { V: "Verbal/Linguistic", P: "Physical/Visual" } },
+        ];
+
+        const PROFILE_LIBRARY = {
+          "SBNV": {
+            title: "The Warm Wordsmith",
+            subtitle: "Self‑deprecating, uplifting, and clever. You invite people in with wit and warmth.",
+            growth: [
+              "Experiment with sharper or more absurd turns to expand your range.",
+              "Try playful banter that edges toward surreal without losing kindness.",
+              "Watch a contrasting style (e.g., O C A P) and borrow a single element.",
+            ],
+            examples: ["John Mulaney (self‑mockery)", "Early Ellen monologues", "Jim Halpert's asides — The Office"],
+          },
+          "SBNP": {
+            title: "The Playful Storyteller",
+            subtitle: "Cozy stories with expressive faces and physical beats.",
+            growth: ["Blend in wordplay to complement physicality.", "Add callbacks for stronger narrative payoff.", "Try low‑stakes crowd work to vary rhythm."],
+            examples: ["Robin Williams (character work)", "Jack Black stage storytelling"],
+          },
+          "SBAV": {
+            title: "The Absurd Linguist",
+            subtitle: "Gentle, surreal word‑bending with whimsical nonsense.",
+            growth: ["Anchor some bits in everyday moments.", "Use structures (rule of three) to frame the weird.", "Test brevity vs. build for each premise."],
+            examples: ["Steven Wright (deadpan)", "Demetri Martin (conceptual bits)"],
+          },
+          "SBAP": {
+            title: "The Goofy Improviser",
+            subtitle: "Playful chaos, improv energy, and wholesome physicality.",
+            growth: ["Thread mini‑stories through the chaos.", "Introduce a recurring prop/character.", "Practice pauses to let laughs breathe."],
+            examples: ["Jim Carrey (elastic physicality)", "Melissa McCarthy (fearless pratfalls)"],
+          },
+          "SCNV": {
+            title: "The Self‑Roasting Satirist",
+            subtitle: "Sharp wordplay dissecting your own flaws.",
+            growth: ["Occasionally turn the lens outward.", "Balance bite with relief lines.", "Use tags to soften or escalate deliberately."],
+            examples: ["Hannah Gadsby (reflective)", "Tig Notaro (deadpan self‑commentary)"],
+          },
+          "SCNP": {
+            title: "The Ironic Mime",
+            subtitle: "Physical satire turned inward.",
+            growth: ["Pair big moves with precise lines.", "Vary tempo (fast bits vs slow burns).", "Explore silent builds to explosive payoff."],
+            examples: ["Rowan Atkinson (Mr. Bean)", "Kristen Wiig (awkward characters)"],
+          },
+          "SCAV": {
+            title: "The Dark Surrealist",
+            subtitle: "Bizarre, critical self‑commentary with an artful edge.",
+            growth: ["Offer clear emotional entry points.", "Alternate heavy themes with light palettes.", "Use metaphor to defang darker beats."],
+            examples: ["Maria Bamford (surreal self‑critiques)", "Bo Burnham (meta)"],
+          },
+          "SCAP": {
+            title: "The Punk Clown",
+            subtitle: "Chaotic, self‑mocking physical comedy with a bite.",
+            growth: ["Calibrate shock to context.", "Let a punchline sit before the next hit.", "Ground wild premises with a simple want."],
+            examples: ["Eric Andre (anarchic)", "Sacha Baron Cohen (physical provocations)"],
+          },
+          "OBNV": {
+            title: "The Friendly Raconteur",
+            subtitle: "Warm, clever stories about others — never punching down.",
+            growth: ["Inject occasional absurd left turns.", "Trim exposition to speed to the turn.", "Play with perspective shifts (2nd person)."],
+            examples: ["Graham Norton (playful interviews)", "LeVar Burton (gentle anecdotes)"],
+          },
+          "OBNP": {
+            title: "The Jolly Host",
+            subtitle: "Group‑binding stories with expressive, physical moments.",
+            growth: ["Test sharper angles sparingly.", "Use running bits across segments.", "Invite audience participation for momentum."],
+            examples: ["Jimmy Fallon (goofy sketches)", "James Corden (games)"],
+          },
+          "OBAV": {
+            title: "The Benevolent Trickster",
+            subtitle: "Absurd premises involving others, always in good faith.",
+            growth: ["Wrap absurdity in mini‑arcs.", "Add taglines that reframe the bit.", "Try improvising constraints (one‑word scenes)."],
+            examples: ["Whose Line Is It Anyway?", "Impractical Jokers (lighthearted)"]
+          },
+          "OBAP": {
+            title: "The Wholesome Prankster",
+            subtitle: "Playful, nonsensical physical setups that keep others safe.",
+            growth: ["Layer witty commentary over visuals.", "Use props to escalate safely.", "Balance surprises with consent cues."],
+            examples: ["Wholesome prank channels", "Mr. Rogers (gentle play)"]
+          },
+          "OCNV": {
+            title: "The Verbal Sniper",
+            subtitle: "Razor‑sharp burns aimed outward; surgical timing and phrasing.",
+            growth: ["Interleave light palate cleansers.", "Signal targets (punching up).", "Develop alt‑tags for different audiences."],
+            examples: ["Stephen Colbert (political takedowns)", "Michelle Wolf (roasts)"]
+          },
+          "OCNP": {
+            title: "The Physical Roaster",
+            subtitle: "Barbed narratives amplified by bold gestures and reenactments.",
+            growth: ["Soften with benevolent beats.", "Let gestures serve story logic.", "Vary scale: micro‑mugging vs big pratfalls."],
+            examples: ["John Cleese (sketch physicality)", "Roast battle reenactments"]
+          },
+          "OCAV": {
+            title: "The Madcap Cynic",
+            subtitle: "Weird, biting scenarios; surreal premises with a sting.",
+            growth: ["Front‑load your worldview.", "Alternate silly with sincere.", "Use call‑backs to reward attentive listeners."],
+            examples: ["Monty Python (absurd critique)", "Tim Minchin (satirical songs)"]
+          },
+          "OCAP": {
+            title: "The Chaotic Provocateur",
+            subtitle: "Physical chaos plus biting satire, aimed at others.",
+            growth: ["Set boundaries to keep control.", "Use escalation ladders.", "End with a release valve (benign tag)."],
+            examples: ["Borat‑style interactions", "Jackass‑adjacent satire"]
+          },
+        };
+
+        // Helper functions
+        function computeScores(answers) {
+          const sums = {};
+          for (const axis of AXES) {
+            sums[axis.key] = { [axis.letters[0]]: 0, [axis.letters[1]]: 0 };
+          }
+
+          ITEMS.forEach((item) => {
+            const v = answers[item.id];
+            if (!v) return;
+            sums[item.axis][item.pole] += v;
+          });
+
+          const letters = [];
+          const detail = {};
+          AXES.forEach((axis) => {
+            const [L1, L2] = axis.letters;
+            const s1 = sums[axis.key][L1] || 0;
+            const s2 = sums[axis.key][L2] || 0;
+            const chosen = s1 >= s2 ? L1 : L2;
+            letters.push(chosen);
+
+            const min = 3, max = 15;
+            const pct1 = ((s1 - min) / (max - min)) * 100;
+            const pct2 = ((s2 - min) / (max - min)) * 100;
+
+            detail[axis.key] = {
+              label: axis.label,
+              poles: axis.poles,
+              letters: axis.letters,
+              raw: { [L1]: s1, [L2]: s2 },
+              pct: { [L1]: Math.max(0, Math.min(100, pct1)), [L2]: Math.max(0, Math.min(100, pct2)) },
+            };
+          });
+
+          const code = letters.join("");
+          return { code, detail };
+        }
+
+        // Components
+        const Likert = ({ value, onChange }) => (
+          <div className="flex gap-2 items-center">
+            {[1, 2, 3, 4, 5].map((v) => (
+              <button
+                key={v}
+                onClick={() => onChange(v)}
+                className={`w-9 h-9 rounded-full border text-sm flex items-center justify-center hover:shadow ${
+                  value === v ? "bg-black text-white border-black" : "bg-white border-gray-300"
+                }`}
+                aria-label={`Select ${v}`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+        );
+
+        const ProgressBar = ({ pct }) => (
+          <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-3 rounded-full progress-bar" style={{ width: `${pct}%` }} />
+          </div>
+        );
+
+        function ResultView({ code, detail, onRetake }) {
+          const profile = PROFILE_LIBRARY[code] || {
+            title: "Your Unique Mix",
+            subtitle: "A rare blend — we don't have a canned blurb yet, but your axis scores below say a lot.",
+            growth: ["Explore your lowest pole with a weekly challenge.", "Borrow a tag from your opposite axis in one bit.", "Rewatch a set in your contrast style and copy 1 technique."],
+            examples: ["—"],
+          };
+
+          const opposite = useMemo(() => {
+            const opp = Object.entries(detail)
+              .map(([k, info]) => {
+                const [L1, L2] = info.letters;
+                return info.pct[L1] >= info.pct[L2] ? L2 : L1;
+              })
+              .join("");
+            return opp;
+          }, [detail]);
+
+          return (
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-8">
+                <h1 className="text-4xl font-extrabold tracking-tight">Your Humor Code</h1>
+                <div className="mt-4 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-black text-white text-xl font-bold">
+                  <span>{code.split("").join(" ")}</span>
+                </div>
+                <p className="mt-4 text-lg text-gray-700">{profile.subtitle}</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6 mb-10">
+                {Object.entries(detail).map(([key, info]) => (
+                  <div key={key} className="p-5 rounded-2xl border bg-white shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold">{info.label}</h3>
+                      <span className="text-sm text-gray-500">{info.letters[0]} / {info.letters[1]}</span>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between text-sm mb-1"><span>{info.letters[0]} — {info.poles[info.letters[0]]}</span><span>{Math.round(info.pct[info.letters[0]])}%</span></div>
+                        <ProgressBar pct={info.pct[info.letters[0]]} />
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-sm mb-1"><span>{info.letters[1]} — {info.poles[info.letters[1]]}</span><span>{Math.round(info.pct[info.letters[1]])}%</span></div>
+                        <ProgressBar pct={info.pct[info.letters[1]]} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-6 rounded-2xl border bg-white shadow-sm mb-6">
+                <h2 className="text-2xl font-bold mb-2">{code} — {profile.title}</h2>
+                <p className="text-gray-800 mb-4">{profile.subtitle}</p>
+                <h3 className="font-semibold mb-1">Growth tips</h3>
+                <ul className="list-disc ml-6 space-y-1 text-gray-800">
+                  {profile.growth.map((g, i) => (<li key={i}>{g}</li>))}
+                </ul>
+                <h3 className="font-semibold mt-4 mb-1">Kindred examples</h3>
+                <p className="text-gray-700">{profile.examples.join(" • ")}</p>
+              </div>
+
+              <div className="p-6 rounded-2xl border bg-white shadow-sm mb-10">
+                <h3 className="font-semibold mb-2">Your Opposite</h3>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white font-bold">
+                  <span>{opposite.split("").join(" ")}</span>
+                </div>
+                <p className="mt-3 text-gray-700">Try a 24‑hour challenge where you imitate your opposite's style in small, safe ways. It stretches timing, targets, and tone.</p>
+              </div>
+
+              <div className="flex flex-wrap gap-3 justify-center">
+                <button onClick={onRetake} className="px-5 py-2 rounded-xl border font-medium hover:bg-gray-50 inline-flex items-center gap-2">
+                  <RotateCcwIcon /> Retake quiz
+                </button>
+                <button
+                  onClick={() => {
+                    const url = typeof window !== 'undefined' ? window.location.href : '';
+                    navigator.clipboard?.writeText(`I'm a ${code.split("").join("") } — ${profile.title}! #HumorCode #HCODE ${url}`);
+                    alert("Share text copied to clipboard!");
+                  }}
+                  className="px-5 py-2 rounded-xl bg-black text-white font-medium hover:opacity-90 inline-flex items-center gap-2"
+                >
+                  <Share2Icon /> Copy share text
+                </button>
+              </div>
+            </div>
+          );
+        }
+
+        // Main App Component
+        function HumorCodeQuizApp() {
+          const [step, setStep] = useState("intro");
+          const [answers, setAnswers] = useState({});
+          const [result, setResult] = useState(null);
+
+          const totalAnswered = Object.keys(answers).length;
+
+          const handleSubmit = () => {
+            if (Object.keys(answers).length < ITEMS.length) {
+              if (!confirm("You haven't answered every item. Score anyway?")) return;
+            }
+            const scored = computeScores(answers);
+            setResult(scored);
+            setStep("result");
+          };
+
+          return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-900">
+              <div className="max-w-4xl mx-auto p-6">
+                {step === "intro" && (
+                  <section className="text-center fade-in">
+                    <h1 className="text-4xl font-extrabold tracking-tight">H‑CODE Humor Quiz</h1>
+                    <p className="mt-3 text-lg text-gray-700 max-w-2xl mx-auto">
+                      Discover your four‑letter humor code across <span className="font-semibold">Target</span>, <span className="font-semibold">Valence</span>, <span className="font-semibold">Cognitive</span>, and <span className="font-semibold">Delivery</span> axes. 24 questions • ~5 minutes.
+                    </p>
+                    <div className="mt-6 inline-flex gap-3">
+                      <button onClick={() => setStep("quiz")} className="px-6 py-3 rounded-2xl bg-black text-white font-semibold hover:opacity-90 inline-flex items-center gap-2">
+                        Start Quiz <ArrowRightIcon />
+                      </button>
+                    </div>
+                    <div className="mt-8 grid md:grid-cols-4 gap-3 text-sm text-left max-w-3xl mx-auto">
+                      {AXES.map((ax) => (
+                        <div key={ax.key} className="p-3 rounded-xl border bg-white">
+                          <div className="font-semibold mb-1">{ax.label}</div>
+                          <div className="text-gray-700">{ax.letters[0]} — {ax.poles[ax.letters[0]]}</div>
+                          <div className="text-gray-700">{ax.letters[1]} — {ax.poles[ax.letters[1]]}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {step === "quiz" && (
+                  <section className="fade-in">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-2xl font-bold">Answer the questions</h2>
+                      <div className="text-sm text-gray-600">{totalAnswered}/{ITEMS.length} answered</div>
+                    </div>
+                    <div className="space-y-4">
+                      {ITEMS.map((item, idx) => (
+                        <div key={item.id} className="p-4 rounded-2xl border bg-white flex flex-col md:flex-row md:items-center gap-4">
+                          <div className="md:w-2/3">
+                            <div className="text-xs uppercase tracking-wide text-gray-500 mb-1">Q{idx + 1} · {item.axis}</div>
+                            <div className="text-gray-900">{item.text}</div>
+                          </div>
+                          <div className="md:w-1/3 flex md:justify-end">
+                            <Likert
+                              value={answers[item.id]}
+                              onChange={(v) => setAnswers((a) => ({ ...a, [item.id]: v }))}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between mt-6">
+                      <button onClick={() => { setAnswers({}); setStep("intro"); }} className="px-5 py-2 rounded-xl border font-medium hover:bg-gray-50">Back</button>
+                      <button onClick={handleSubmit} className="px-6 py-2 rounded-xl bg-black text-white font-semibold hover:opacity-90 inline-flex items-center gap-2">
+                        See Results <CheckIcon />
+                      </button>
+                    </div>
+                  </section>
+                )}
+
+                {step === "result" && result && (
+                  <section className="fade-in">
+                    <ResultView code={result.code} detail={result.detail} onRetake={() => { setAnswers({}); setResult(null); setStep("quiz"); }} />
+                  </section>
+                )}
+
+                <footer className="text-center text-xs text-gray-500 mt-12 pb-6">© {new Date().getFullYear()} H‑CODE • Humor Typology</footer>
+              </div>
+            </div>
+          );
+        }
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<HumorCodeQuizApp />);
+    </script>
+</body>
+</html>
