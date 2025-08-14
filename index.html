@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>H-CODE Humor Quiz</title>
+    <title>🤣 H-CODE Humor Quiz - What's Your Comedy DNA? 🧬</title>
+    
+    <!-- Google Fonts for fun typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Comic+Neue:wght@300;400;700&family=Bungee:wght@400&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,27 +18,123 @@
     <!-- Babel for JSX transformation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Simple animations with CSS transitions instead of Framer Motion --></script>
-    
     <style>
-        /* Custom styles for progress bars since we can't use dynamic styles easily */
+        /* Fun font families */
+        .font-fun {
+            font-family: 'Fredoka', cursive;
+        }
+        .font-comic {
+            font-family: 'Comic Neue', cursive;
+        }
+        .font-bungee {
+            font-family: 'Bungee', cursive;
+        }
+        
+        /* Custom styles for progress bars with rainbow gradients! */
         .progress-bar {
-            transition: width 0.3s ease;
-            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            transition: width 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7, #fd79a8);
+            background-size: 300% 300%;
+            animation: rainbow-slide 3s ease infinite;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
         }
         
-        /* Simple fade-in animations to replace Framer Motion */
+        @keyframes rainbow-slide {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Bouncy fade-in animations */
         .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes bounceIn {
+            0% { 
+                opacity: 0; 
+                transform: scale(0.3) translateY(50px) rotate(-5deg); 
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1) translateY(-10px) rotate(2deg);
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1) translateY(0) rotate(0deg); 
+            }
+        }
+        
+        /* Fun hover effects */
+        .wiggle:hover {
+            animation: wiggle 0.5s ease-in-out;
+        }
+        
+        @keyframes wiggle {
+            0%, 7% { transform: rotateZ(0deg); }
+            15% { transform: rotateZ(-15deg); }
+            20% { transform: rotateZ(10deg); }
+            25% { transform: rotateZ(-10deg); }
+            30% { transform: rotateZ(6deg); }
+            35% { transform: rotateZ(-4deg); }
+            40%, 100% { transform: rotateZ(0deg); }
+        }
+        
+        /* Pulsing glow effect */
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulseGlow {
+            from {
+                box-shadow: 0 0 10px #ff6b6b, 0 0 20px #ff6b6b, 0 0 30px #ff6b6b;
+            }
+            to {
+                box-shadow: 0 0 5px #4ecdc4, 0 0 15px #4ecdc4, 0 0 25px #4ecdc4;
+            }
+        }
+        
+        /* Floating emoji animation */
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Fun gradient backgrounds */
+        .bg-fun-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .bg-party-gradient {
+            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        }
+        
+        .bg-joke-gradient {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
         }
         
         .quiz-transition {
-            transition: all 0.3s ease-in-out;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        /* Confetti-like background pattern */
+        body::before {
+            content: "🎉 😂 🤣 😆 🎭 🃏 🎪 ✨ 🌟 💫";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            font-size: 30px;
+            z-index: -1;
+            animation: float 4s ease-in-out infinite;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -100,112 +199,112 @@
         ];
 
         const AXES = [
-          { key: "Target", letters: ["S", "O"], label: "Target Orientation", poles: { S: "Self‑directed", O: "Other‑directed" } },
-          { key: "Valence", letters: ["B", "C"], label: "Intent Valence", poles: { B: "Benevolent", C: "Critical" } },
-          { key: "Cognitive", letters: ["N", "A"], label: "Cognitive Style", poles: { N: "Narrative‑Resolution", A: "Absurd‑Incongruous" } },
-          { key: "Delivery", letters: ["V", "P"], label: "Delivery Mode", poles: { V: "Verbal/Linguistic", P: "Physical/Visual" } },
+          { key: "Target", letters: ["S", "O"], label: "🎯 Target Orientation", poles: { S: "Self‑directed 🪞", O: "Other‑directed 👥" } },
+          { key: "Valence", letters: ["B", "C"], label: "💝 Intent Valence", poles: { B: "Benevolent 🤗", C: "Critical 🗡️" } },
+          { key: "Cognitive", letters: ["N", "A"], label: "🧠 Cognitive Style", poles: { N: "Narrative‑Resolution 📚", A: "Absurd‑Incongruous 🤪" } },
+          { key: "Delivery", letters: ["V", "P"], label: "🎭 Delivery Mode", poles: { V: "Verbal/Linguistic 💬", P: "Physical/Visual 🤸‍♂️" } },
         ];
 
         const PROFILE_LIBRARY = {
           "SBNV": {
-            title: "The Warm Wordsmith",
-            subtitle: "Self‑deprecating, uplifting, and clever. You invite people in with wit and warmth.",
+            title: "🤗 The Warm Wordsmith",
+            subtitle: "Self‑deprecating, uplifting, and clever. You invite people in with wit and warmth like a comedy campfire! 🔥✨",
             growth: [
-              "Experiment with sharper or more absurd turns to expand your range.",
-              "Try playful banter that edges toward surreal without losing kindness.",
-              "Watch a contrasting style (e.g., O C A P) and borrow a single element.",
+              "🌶️ Experiment with sharper or more absurd turns to expand your range—add some spice to that sweetness!",
+              "🎪 Try playful banter that edges toward surreal without losing kindness—like being a friendly circus ringmaster!",
+              "🎭 Watch a contrasting style (e.g., O C A P) and borrow a single element—comedy cross-training!",
             ],
-            examples: ["John Mulaney (self‑mockery)", "Early Ellen monologues", "Jim Halpert's asides — The Office"],
+            examples: ["John Mulaney (self‑mockery master 👨‍🎤)", "Early Ellen monologues (pure joy 💃)", "Jim Halpert's asides — The Office (camera wink champion 😉)"],
           },
           "SBNP": {
-            title: "The Playful Storyteller",
-            subtitle: "Cozy stories with expressive faces and physical beats.",
-            growth: ["Blend in wordplay to complement physicality.", "Add callbacks for stronger narrative payoff.", "Try low‑stakes crowd work to vary rhythm."],
-            examples: ["Robin Williams (character work)", "Jack Black stage storytelling"],
+            title: "🎭 The Playful Storyteller",
+            subtitle: "Cozy stories with expressive faces and physical beats—you're like a human emoji! 😄🤸‍♂️",
+            growth: ["🔤 Blend in wordplay to complement physicality—be a walking, talking pun machine!", "🔄 Add callbacks for stronger narrative payoff—make your stories boomerang back for extra laughs!", "👥 Try low‑stakes crowd work to vary rhythm—the audience is your playground!"],
+            examples: ["Robin Williams (character work wizard 🧙‍♂️)", "Jack Black stage storytelling (pure energy bomb 💥)"],
           },
           "SBAV": {
-            title: "The Absurd Linguist",
-            subtitle: "Gentle, surreal word‑bending with whimsical nonsense.",
-            growth: ["Anchor some bits in everyday moments.", "Use structures (rule of three) to frame the weird.", "Test brevity vs. build for each premise."],
-            examples: ["Steven Wright (deadpan)", "Demetri Martin (conceptual bits)"],
+            title: "🦄 The Absurd Linguist",
+            subtitle: "Gentle, surreal word‑bending with whimsical nonsense—you speak fluent gibberish with a PhD! 🎓🤪",
+            growth: ["⚓ Anchor some bits in everyday moments—make the weird feel familiar!", "📏 Use structures (rule of three) to frame the weird—organize the chaos!", "⏱️ Test brevity vs. build for each premise—find your perfect weird timing!"],
+            examples: ["Steven Wright (deadpan master 😐)", "Demetri Martin (conceptual bits genius 🧠📊)"],
           },
           "SBAP": {
-            title: "The Goofy Improviser",
-            subtitle: "Playful chaos, improv energy, and wholesome physicality.",
-            growth: ["Thread mini‑stories through the chaos.", "Introduce a recurring prop/character.", "Practice pauses to let laughs breathe."],
-            examples: ["Jim Carrey (elastic physicality)", "Melissa McCarthy (fearless pratfalls)"],
+            title: "🤸‍♂️ The Goofy Improviser",
+            subtitle: "Playful chaos, improv energy, and wholesome physicality—you're a human cartoon character! 🎨💫",
+            growth: ["🧵 Thread mini‑stories through the chaos—connect your beautiful madness!", "🎪 Introduce a recurring prop/character—give your chaos a mascot!", "⏸️ Practice pauses to let laughs breathe—even chaos needs oxygen!"],
+            examples: ["Jim Carrey (elastic physicality god 🤸‍♂️)", "Melissa McCarthy (fearless pratfall queen 👑💥)"],
           },
           "SCNV": {
-            title: "The Self‑Roasting Satirist",
-            subtitle: "Sharp wordplay dissecting your own flaws.",
-            growth: ["Occasionally turn the lens outward.", "Balance bite with relief lines.", "Use tags to soften or escalate deliberately."],
-            examples: ["Hannah Gadsby (reflective)", "Tig Notaro (deadpan self‑commentary)"],
+            title: "🗡️ The Self‑Roasting Satirist",
+            subtitle: "Sharp wordplay dissecting your own flaws—you're your own toughest (and funniest) critic! 🔍😏",
+            growth: ["👀 Occasionally turn the lens outward—give yourself a break from the mirror!", "⚖️ Balance bite with relief lines—be the yin AND yang of comedy!", "🏷️ Use tags to soften or escalate deliberately—you're the volume control of your own roast!"],
+            examples: ["Hannah Gadsby (reflective powerhouse 💪)", "Tig Notaro (deadpan self‑commentary master 😐👑)"],
           },
           "SCNP": {
-            title: "The Ironic Mime",
-            subtitle: "Physical satire turned inward.",
-            growth: ["Pair big moves with precise lines.", "Vary tempo (fast bits vs slow burns).", "Explore silent builds to explosive payoff."],
-            examples: ["Rowan Atkinson (Mr. Bean)", "Kristen Wiig (awkward characters)"],
+            title: "🎭 The Ironic Mime",
+            subtitle: "Physical satire turned inward—you're like Charlie Chaplin having an existential crisis! 🤔🎪",
+            growth: ["🎯 Pair big moves with precise lines—be physically loud but verbally surgical!", "🎵 Vary tempo (fast bits vs slow burns)—you're conducting a comedy orchestra!", "🤫 Explore silent builds to explosive payoff—master the art of comedic suspense!"],
+            examples: ["Rowan Atkinson (Mr. Bean genius 🧸)", "Kristen Wiig (awkward character queen 👑😬)"],
           },
           "SCAV": {
-            title: "The Dark Surrealist",
-            subtitle: "Bizarre, critical self‑commentary with an artful edge.",
-            growth: ["Offer clear emotional entry points.", "Alternate heavy themes with light palettes.", "Use metaphor to defang darker beats."],
-            examples: ["Maria Bamford (surreal self‑critiques)", "Bo Burnham (meta)"],
+            title: "🖤 The Dark Surrealist",
+            subtitle: "Bizarre, critical self‑commentary with an artful edge—you're like Salvador Dalí having a therapy session! 🎭💭",
+            growth: ["💡 Offer clear emotional entry points—throw your audience a lifeline in the confusion!", "⚖️ Alternate heavy themes with light palettes—be the yin-yang of comedy!", "🛡️ Use metaphor to defang darker beats—wrap your darkness in pretty paper!"],
+            examples: ["Maria Bamford (surreal self‑critique wizard 🧙‍♀️)", "Bo Burnham (meta-comedy mastermind 🤯)"],
           },
           "SCAP": {
-            title: "The Punk Clown",
-            subtitle: "Chaotic, self‑mocking physical comedy with a bite.",
-            growth: ["Calibrate shock to context.", "Let a punchline sit before the next hit.", "Ground wild premises with a simple want."],
-            examples: ["Eric Andre (anarchic)", "Sacha Baron Cohen (physical provocations)"],
+            title: "🤡 The Punk Clown",
+            subtitle: "Chaotic, self‑mocking physical comedy with a bite—you're a beautiful disaster with perfect timing! 💥🎪",
+            growth: ["🎯 Calibrate shock to context—read the room, then shock it appropriately!", "⏸️ Let a punchline sit before the next hit—even chaos needs to breathe!", "⚓ Ground wild premises with a simple want—give your madness a mission!"],
+            examples: ["Eric Andre (anarchic energy god ⚡)", "Sacha Baron Cohen (physical provocation master 🥸)"],
           },
           "OBNV": {
-            title: "The Friendly Raconteur",
-            subtitle: "Warm, clever stories about others — never punching down.",
-            growth: ["Inject occasional absurd left turns.", "Trim exposition to speed to the turn.", "Play with perspective shifts (2nd person)."],
-            examples: ["Graham Norton (playful interviews)", "LeVar Burton (gentle anecdotes)"],
+            title: "🤝 The Friendly Raconteur",
+            subtitle: "Warm, clever stories about others — never punching down. You're the wholesome narrator we all need! 📚❤️",
+            growth: ["🌀 Inject occasional absurd left turns—surprise your audience with delightful detours!", "✂️ Trim exposition to speed to the turn—get to the good stuff faster!", "👁️ Play with perspective shifts (2nd person)—make them part of the story!"],
+            examples: ["Graham Norton (playful interview wizard 🎤)", "LeVar Burton (gentle anecdote master 📖)"],
           },
           "OBNP": {
-            title: "The Jolly Host",
-            subtitle: "Group‑binding stories with expressive, physical moments.",
-            growth: ["Test sharper angles sparingly.", "Use running bits across segments.", "Invite audience participation for momentum."],
-            examples: ["Jimmy Fallon (goofy sketches)", "James Corden (games)"],
+            title: "🎉 The Jolly Host",
+            subtitle: "Group‑binding stories with expressive, physical moments—you're the human equivalent of a group hug! 🤗🎪",
+            growth: ["⚡ Test sharper angles sparingly—add just a pinch of spice!", "🔄 Use running bits across segments—create your own inside jokes!", "🙌 Invite audience participation for momentum—make them part of the show!"],
+            examples: ["Jimmy Fallon (goofy sketch king 👑)", "James Corden (game show energy ⚡)"],
           },
           "OBAV": {
-            title: "The Benevolent Trickster",
-            subtitle: "Absurd premises involving others, always in good faith.",
-            growth: ["Wrap absurdity in mini‑arcs.", "Add taglines that reframe the bit.", "Try improvising constraints (one‑word scenes)."],
-            examples: ["Whose Line Is It Anyway?", "Impractical Jokers (lighthearted)"]
+            title: "🃏 The Benevolent Trickster",
+            subtitle: "Absurd premises involving others, always in good faith—you're like a kind-hearted chaos wizard! 🧙‍♂️✨",
+            growth: ["📚 Wrap absurdity in mini‑arcs—give your chaos a story!", "🏷️ Add taglines that reframe the bit—help your audience keep up!", "🎭 Try improvising constraints (one‑word scenes)—challenge yourself creatively!"],
+            examples: ["Whose Line Is It Anyway? (improv perfection 🎭)", "Impractical Jokers (lighthearted mischief 😄)"]
           },
           "OBAP": {
-            title: "The Wholesome Prankster",
-            subtitle: "Playful, nonsensical physical setups that keep others safe.",
-            growth: ["Layer witty commentary over visuals.", "Use props to escalate safely.", "Balance surprises with consent cues."],
-            examples: ["Wholesome prank channels", "Mr. Rogers (gentle play)"]
+            title: "😇 The Wholesome Prankster",
+            subtitle: "Playful, nonsensical physical setups that keep others safe—you're Mr. Rogers with a mischievous streak! 🏡🎪",
+            growth: ["💬 Layer witty commentary over visuals—be the narrator of your own chaos!", "🎭 Use props to escalate safely—make inanimate objects your co-stars!", "🤝 Balance surprises with consent cues—keep everyone happy and laughing!"],
+            examples: ["Wholesome prank channels (pure joy 😊)", "Mr. Rogers (gentle play master 🧸)"]
           },
           "OCNV": {
-            title: "The Verbal Sniper",
-            subtitle: "Razor‑sharp burns aimed outward; surgical timing and phrasing.",
-            growth: ["Interleave light palate cleansers.", "Signal targets (punching up).", "Develop alt‑tags for different audiences."],
-            examples: ["Stephen Colbert (political takedowns)", "Michelle Wolf (roasts)"]
+            title: "🎯 The Verbal Sniper",
+            subtitle: "Razor‑sharp burns aimed outward; surgical timing and phrasing—you're a comedy marksman! 🏹💥",
+            growth: ["🍯 Interleave light palate cleansers—sweeten the medicine!", "⬆️ Signal targets (punching up)—aim for the powerful, not the powerless!", "🎛️ Develop alt‑tags for different audiences—be a comedy chameleon!"],
+            examples: ["Stephen Colbert (political takedown artist 🎭)", "Michelle Wolf (roast master 🔥)"]
           },
           "OCNP": {
-            title: "The Physical Roaster",
-            subtitle: "Barbed narratives amplified by bold gestures and reenactments.",
-            growth: ["Soften with benevolent beats.", "Let gestures serve story logic.", "Vary scale: micro‑mugging vs big pratfalls."],
-            examples: ["John Cleese (sketch physicality)", "Roast battle reenactments"]
+            title: "🤺 The Physical Roaster",
+            subtitle: "Barbed narratives amplified by bold gestures and reenactments—you're a living, breathing cartoon villain! 🎭⚡",
+            growth: ["💖 Soften with benevolent beats—show your heart between the jabs!", "📖 Let gestures serve story logic—make every movement meaningful!", "📏 Vary scale: micro‑mugging vs big pratfalls—be dynamically ridiculous!"],
+            examples: ["John Cleese (sketch physicality legend 🦶)", "Roast battle reenactments (theatrical burns 🎭)"]
           },
           "OCAV": {
-            title: "The Madcap Cynic",
-            subtitle: "Weird, biting scenarios; surreal premises with a sting.",
-            growth: ["Front‑load your worldview.", "Alternate silly with sincere.", "Use call‑backs to reward attentive listeners."],
-            examples: ["Monty Python (absurd critique)", "Tim Minchin (satirical songs)"]
+            title: "🎪 The Madcap Cynic",
+            subtitle: "Weird, biting scenarios; surreal premises with a sting—you're like a fever dream with an attitude! 🌡️😈",
+            growth: ["🏠 Front‑load your worldview—let people into your beautiful madness!", "🎭 Alternate silly with sincere—be unpredictably human!", "🔗 Use call‑backs to reward attentive listeners—create a secret club of understanding!"],
+            examples: ["Monty Python (absurd critique masters 🐍)", "Tim Minchin (satirical song genius 🎵)"]
           },
           "OCAP": {
-            title: "The Chaotic Provocateur",
-            subtitle: "Physical chaos plus biting satire, aimed at others.",
-            growth: ["Set boundaries to keep control.", "Use escalation ladders.", "End with a release valve (benign tag)."],
-            examples: ["Borat‑style interactions", "Jackass‑adjacent satire"]
+            title: "💥 The Chaotic Provocateur",
+            subtitle: "Physical chaos plus biting satire, aimed at others—you're a hurricane with a sense of humor! 🌪️😂",
+            growth: ["🚦 Set boundaries to keep control—be chaotic but not destructive!", "📈 Use escalation ladders—build your chaos systematically!", "🚪 End with a release valve (benign tag)—give everyone a safe landing!"],
+            examples: ["Borat‑style interactions (fearless commitment 🤝)", "Jackass‑adjacent satire (controlled chaos 💥)"]
           },
         };
 
@@ -249,22 +348,36 @@
         }
 
         // Components
-        const Likert = ({ value, onChange }) => (
-          <div className="flex gap-2 items-center">
-            {[1, 2, 3, 4, 5].map((v) => (
-              <button
-                key={v}
-                onClick={() => onChange(v)}
-                className={`w-9 h-9 rounded-full border text-sm flex items-center justify-center hover:shadow ${
-                  value === v ? "bg-black text-white border-black" : "bg-white border-gray-300"
-                }`}
-                aria-label={`Select ${v}`}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
-        );
+        const Likert = ({ value, onChange }) => {
+          const emojis = ['😢', '😕', '😐', '😊', '🤣'];
+          const labels = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'];
+          
+          return (
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex gap-2 items-center">
+                {[1, 2, 3, 4, 5].map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => onChange(v)}
+                    className={`w-12 h-12 rounded-full text-2xl flex items-center justify-center transition-all wiggle ${
+                      value === v 
+                        ? "bg-gradient-to-br from-yellow-300 to-orange-400 scale-125 shadow-2xl pulse-glow" 
+                        : "bg-white/20 backdrop-blur-sm hover:bg-white/30 hover:scale-110"
+                    }`}
+                    aria-label={`${labels[v-1]} - ${v}`}
+                  >
+                    {emojis[v-1]}
+                  </button>
+                ))}
+              </div>
+              {value && (
+                <div className="text-white/80 text-sm font-comic text-center">
+                  {labels[value-1]} {emojis[value-1]}
+                </div>
+              )}
+            </div>
+          );
+        };
 
         const ProgressBar = ({ pct }) => (
           <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
@@ -291,68 +404,121 @@
           }, [detail]);
 
           return (
-            <div className="max-w-3xl mx-auto">
-              <div className="text-center mb-8">
-                <h1 className="text-4xl font-extrabold tracking-tight">Your Humor Code</h1>
-                <div className="mt-4 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-black text-white text-xl font-bold">
-                  <span>{code.split("").join(" ")}</span>
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-10">
+                <div className="text-6xl mb-4 float">🎉</div>
+                <h1 className="text-5xl font-bungee text-white mb-6 drop-shadow-lg">Your Comedy DNA! 🧬</h1>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 rounded-3xl blur-lg opacity-75"></div>
+                  <div className="relative bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 px-8 py-6 rounded-3xl text-white text-4xl font-bungee shadow-2xl">
+                    {code.split("").join(" - ")}
+                  </div>
                 </div>
-                <p className="mt-4 text-lg text-gray-700">{profile.subtitle}</p>
+                <div className="mt-6 bg-white/20 backdrop-blur-sm p-6 rounded-3xl">
+                  <h2 className="text-3xl font-bold text-white mb-2">{profile.title}</h2>
+                  <p className="text-xl font-comic text-white/90 leading-relaxed">{profile.subtitle}</p>
+                </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6 mb-10">
-                {Object.entries(detail).map(([key, info]) => (
-                  <div key={key} className="p-5 rounded-2xl border bg-white shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold">{info.label}</h3>
-                      <span className="text-sm text-gray-500">{info.letters[0]} / {info.letters[1]}</span>
+                {Object.entries(detail).map(([key, info], idx) => (
+                  <div key={key} className="p-6 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all wiggle" style={{animationDelay: `${idx * 0.1}s`}}>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-xl text-white">{info.label}</h3>
+                      <span className="text-sm text-white/70 bg-white/20 px-3 py-1 rounded-full">{info.letters[0]} / {info.letters[1]}</span>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div>
-                        <div className="flex justify-between text-sm mb-1"><span>{info.letters[0]} — {info.poles[info.letters[0]]}</span><span>{Math.round(info.pct[info.letters[0]])}%</span></div>
-                        <ProgressBar pct={info.pct[info.letters[0]]} />
+                        <div className="flex justify-between text-sm mb-2 text-white">
+                          <span className="font-comic">{info.letters[0]} — {info.poles[info.letters[0]]}</span>
+                          <span className="font-bold">{Math.round(info.pct[info.letters[0]])}% 🔥</span>
+                        </div>
+                        <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+                          <ProgressBar pct={info.pct[info.letters[0]]} />
+                        </div>
                       </div>
                       <div>
-                        <div className="flex justify-between text-sm mb-1"><span>{info.letters[1]} — {info.poles[info.letters[1]]}</span><span>{Math.round(info.pct[info.letters[1]])}%</span></div>
-                        <ProgressBar pct={info.pct[info.letters[1]]} />
+                        <div className="flex justify-between text-sm mb-2 text-white">
+                          <span className="font-comic">{info.letters[1]} — {info.poles[info.letters[1]]}</span>
+                          <span className="font-bold">{Math.round(info.pct[info.letters[1]])}% 🔥</span>
+                        </div>
+                        <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+                          <ProgressBar pct={info.pct[info.letters[1]]} />
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="p-6 rounded-2xl border bg-white shadow-sm mb-6">
-                <h2 className="text-2xl font-bold mb-2">{code} — {profile.title}</h2>
-                <p className="text-gray-800 mb-4">{profile.subtitle}</p>
-                <h3 className="font-semibold mb-1">Growth tips</h3>
-                <ul className="list-disc ml-6 space-y-1 text-gray-800">
-                  {profile.growth.map((g, i) => (<li key={i}>{g}</li>))}
-                </ul>
-                <h3 className="font-semibold mt-4 mb-1">Kindred examples</h3>
-                <p className="text-gray-700">{profile.examples.join(" • ")}</p>
-              </div>
-
-              <div className="p-6 rounded-2xl border bg-white shadow-sm mb-10">
-                <h3 className="font-semibold mb-2">Your Opposite</h3>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white font-bold">
-                  <span>{opposite.split("").join(" ")}</span>
+              <div className="p-8 rounded-3xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 backdrop-blur-sm border border-white/20 mb-8">
+                <div className="text-center mb-6">
+                  <h2 className="text-3xl font-bungee text-white mb-2">{code.split("").join("")} — {profile.title}</h2>
+                  <p className="text-lg font-comic text-white/90 mb-6">{profile.subtitle}</p>
                 </div>
-                <p className="mt-3 text-gray-700">Try a 24‑hour challenge where you imitate your opposite's style in small, safe ways. It stretches timing, targets, and tone.</p>
+                
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="font-bold text-xl text-white mb-4 flex items-center gap-2">
+                      🚀 Growth Tips
+                    </h3>
+                    <ul className="space-y-3">
+                      {profile.growth.map((g, i) => (
+                        <li key={i} className="text-white/90 font-comic flex items-start gap-3">
+                          <span className="text-yellow-300 text-xl">✨</span>
+                          <span>{g}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-bold text-xl text-white mb-4 flex items-center gap-2">
+                      👑 Kindred Comedy Spirits
+                    </h3>
+                    <div className="space-y-2">
+                      {profile.examples.map((example, i) => (
+                        <div key={i} className="bg-white/10 p-3 rounded-2xl text-white/90 font-comic flex items-center gap-2">
+                          <span className="text-2xl">🎭</span>
+                          <span>{example}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-3 justify-center">
-                <button onClick={onRetake} className="px-5 py-2 rounded-xl border font-medium hover:bg-gray-50 inline-flex items-center gap-2">
-                  <RotateCcwIcon /> Retake quiz
+              <div className="p-8 rounded-3xl bg-gradient-to-br from-orange-500/20 to-red-600/20 backdrop-blur-sm border border-white/20 mb-10">
+                <h3 className="font-bold text-2xl text-white mb-4 text-center flex items-center justify-center gap-3">
+                  🔄 Your Comedy Opposite
+                </h3>
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-3 px-8 py-4 rounded-3xl bg-gradient-to-r from-gray-700 to-black text-white text-2xl font-bungee shadow-2xl pulse-glow mb-4">
+                    <span>🎭</span>
+                    <span>{opposite.split("").join(" - ")}</span>
+                    <span>🎪</span>
+                  </div>
+                  <p className="text-lg font-comic text-white/90 leading-relaxed">
+                    Try a 24‑hour challenge where you imitate your opposite's style in small, safe ways. 
+                    It stretches timing, targets, and tone—like comedy cross-training! 💪😄
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-4 justify-center">
+                <button onClick={onRetake} className="px-8 py-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white font-bold hover:bg-white/30 transition-all wiggle inline-flex items-center gap-3">
+                  <RotateCcwIcon /> 🔄 Take Quiz Again!
                 </button>
                 <button
                   onClick={() => {
                     const url = typeof window !== 'undefined' ? window.location.href : '';
-                    navigator.clipboard?.writeText(`I'm a ${code.split("").join("") } — ${profile.title}! #HumorCode #HCODE ${url}`);
-                    alert("Share text copied to clipboard!");
+                    const shareText = `🎉 I just discovered my comedy DNA! I'm a ${code.split("").join("")} — ${profile.title}! 🎭✨ #HumorCode #HCODE\n\nFind your funny at: ${url}`;
+                    navigator.clipboard?.writeText(shareText);
+                    alert("🎊 Share text copied to clipboard! Spread the laughter! 😄");
                   }}
-                  className="px-5 py-2 rounded-xl bg-black text-white font-medium hover:opacity-90 inline-flex items-center gap-2"
+                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold hover:scale-105 transition-transform inline-flex items-center gap-3 shadow-2xl pulse-glow"
                 >
-                  <Share2Icon /> Copy share text
+                  <Share2Icon /> 📢 Share My Comedy DNA!
                 </button>
               </div>
             </div>
@@ -377,25 +543,35 @@
           };
 
           return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-900">
+            <div className="min-h-screen bg-fun-gradient text-white font-fun">
               <div className="max-w-4xl mx-auto p-6">
                 {step === "intro" && (
                   <section className="text-center fade-in">
-                    <h1 className="text-4xl font-extrabold tracking-tight">H‑CODE Humor Quiz</h1>
-                    <p className="mt-3 text-lg text-gray-700 max-w-2xl mx-auto">
-                      Discover your four‑letter humor code across <span className="font-semibold">Target</span>, <span className="font-semibold">Valence</span>, <span className="font-semibold">Cognitive</span>, and <span className="font-semibold">Delivery</span> axes. 24 questions • ~5 minutes.
+                    <div className="mb-6 text-6xl float">🤣</div>
+                    <h1 className="text-6xl font-bungee tracking-tight mb-4 pulse-glow text-white drop-shadow-lg">
+                      H‑CODE Humor Quiz
+                    </h1>
+                    <div className="text-4xl mb-4">🧬 What's Your Comedy DNA? 🎭</div>
+                    <p className="mt-3 text-xl font-comic max-w-2xl mx-auto text-white/90 leading-relaxed">
+                      Discover your four‑letter humor code across <span className="font-bold bg-white/20 px-2 py-1 rounded-lg">🎯 Target</span>, <span className="font-bold bg-white/20 px-2 py-1 rounded-lg">💝 Valence</span>, <span className="font-bold bg-white/20 px-2 py-1 rounded-lg">🧠 Cognitive</span>, and <span className="font-bold bg-white/20 px-2 py-1 rounded-lg">🎭 Delivery</span> axes. 
                     </p>
-                    <div className="mt-6 inline-flex gap-3">
-                      <button onClick={() => setStep("quiz")} className="px-6 py-3 rounded-2xl bg-black text-white font-semibold hover:opacity-90 inline-flex items-center gap-2">
-                        Start Quiz <ArrowRightIcon />
+                    <div className="text-lg text-white/80 mt-2">
+                      24 hilarious questions • ~5 minutes of pure fun! ⏱️✨
+                    </div>
+                    <div className="mt-8 inline-flex gap-3">
+                      <button onClick={() => setStep("quiz")} className="px-8 py-4 rounded-3xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-bold text-lg hover:scale-105 transition-transform wiggle inline-flex items-center gap-3 shadow-2xl pulse-glow">
+                        🚀 Start the Fun! <ArrowRightIcon />
                       </button>
                     </div>
-                    <div className="mt-8 grid md:grid-cols-4 gap-3 text-sm text-left max-w-3xl mx-auto">
-                      {AXES.map((ax) => (
-                        <div key={ax.key} className="p-3 rounded-xl border bg-white">
-                          <div className="font-semibold mb-1">{ax.label}</div>
-                          <div className="text-gray-700">{ax.letters[0]} — {ax.poles[ax.letters[0]]}</div>
-                          <div className="text-gray-700">{ax.letters[1]} — {ax.poles[ax.letters[1]]}</div>
+                    <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-4 gap-4 text-left max-w-4xl mx-auto">
+                      {AXES.map((ax, idx) => (
+                        <div key={ax.key} className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all wiggle" style={{animationDelay: `${idx * 0.1}s`}}>
+                          <div className="font-bold text-lg mb-2 text-white">{ax.label}</div>
+                          <div className="text-white/90 text-sm space-y-1">
+                            <div className="bg-white/10 p-2 rounded-lg">{ax.letters[0]} — {ax.poles[ax.letters[0]]}</div>
+                            <div className="text-center text-white/60">vs</div>
+                            <div className="bg-white/10 p-2 rounded-lg">{ax.letters[1]} — {ax.poles[ax.letters[1]]}</div>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -404,16 +580,34 @@
 
                 {step === "quiz" && (
                   <section className="fade-in">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-2xl font-bold">Answer the questions</h2>
-                      <div className="text-sm text-gray-600">{totalAnswered}/{ITEMS.length} answered</div>
+                    <div className="text-center mb-8">
+                      <div className="text-4xl mb-2">🎪</div>
+                      <h2 className="text-4xl font-bungee text-white mb-2">Let's Find Your Funny! 🎭</h2>
+                      <div className="text-xl font-comic text-white/90">
+                        {totalAnswered === 0 && "Ready to discover what makes you tick? 😄"}
+                        {totalAnswered > 0 && totalAnswered < 12 && "You're getting warmed up! Keep going! 🔥"}
+                        {totalAnswered >= 12 && totalAnswered < 24 && "Halfway there! You're on fire! 🚀"}
+                        {totalAnswered === 24 && "All done! Time to see your comedy DNA! 🧬✨"}
+                      </div>
+                      <div className="mt-4 bg-white/20 rounded-full h-4 overflow-hidden">
+                        <div 
+                          className="progress-bar h-full transition-all duration-1000" 
+                          style={{width: `${(totalAnswered / ITEMS.length) * 100}%`}}
+                        ></div>
+                      </div>
+                      <div className="text-white/80 mt-2 font-bold">{totalAnswered}/{ITEMS.length} questions answered ({Math.round((totalAnswered / ITEMS.length) * 100)}%)</div>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       {ITEMS.map((item, idx) => (
-                        <div key={item.id} className="p-4 rounded-2xl border bg-white flex flex-col md:flex-row md:items-center gap-4">
+                        <div key={item.id} className="p-6 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all quiz-transition flex flex-col md:flex-row md:items-center gap-4 wiggle">
                           <div className="md:w-2/3">
-                            <div className="text-xs uppercase tracking-wide text-gray-500 mb-1">Q{idx + 1} · {item.axis}</div>
-                            <div className="text-gray-900">{item.text}</div>
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className="text-2xl">{idx < 6 ? '🎯' : idx < 12 ? '💝' : idx < 18 ? '🧠' : '🎭'}</div>
+                              <div className="text-sm font-bold text-white/80 bg-white/20 px-3 py-1 rounded-full">
+                                Q{idx + 1} • {item.axis}
+                              </div>
+                            </div>
+                            <div className="text-white font-comic text-lg leading-relaxed">{item.text}</div>
                           </div>
                           <div className="md:w-1/3 flex md:justify-end">
                             <Likert
@@ -424,10 +618,12 @@
                         </div>
                       ))}
                     </div>
-                    <div className="flex items-center justify-between mt-6">
-                      <button onClick={() => { setAnswers({}); setStep("intro"); }} className="px-5 py-2 rounded-xl border font-medium hover:bg-gray-50">Back</button>
-                      <button onClick={handleSubmit} className="px-6 py-2 rounded-xl bg-black text-white font-semibold hover:opacity-90 inline-flex items-center gap-2">
-                        See Results <CheckIcon />
+                    <div className="flex flex-col sm:flex-row items-center justify-between mt-10 gap-4">
+                      <button onClick={() => { setAnswers({}); setStep("intro"); }} className="px-6 py-3 rounded-2xl bg-white/20 text-white font-bold hover:bg-white/30 transition-all wiggle">
+                        🔙 Back to Start
+                      </button>
+                      <button onClick={handleSubmit} className="px-8 py-4 rounded-3xl bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 text-white font-bold text-lg hover:scale-105 transition-transform inline-flex items-center gap-3 shadow-2xl pulse-glow">
+                        🎉 Reveal My Comedy DNA! <CheckIcon />
                       </button>
                     </div>
                   </section>
@@ -435,11 +631,20 @@
 
                 {step === "result" && result && (
                   <section className="fade-in">
+                    <div className="text-center mb-8">
+                      <div className="text-6xl mb-4 float">🎊</div>
+                      <h2 className="text-4xl font-bungee text-white mb-2">Your Comedy DNA Revealed! 🧬</h2>
+                      <div className="text-xl font-comic text-white/90">
+                        Drumroll please... 🥁✨
+                      </div>
+                    </div>
                     <ResultView code={result.code} detail={result.detail} onRetake={() => { setAnswers({}); setResult(null); setStep("quiz"); }} />
                   </section>
                 )}
 
-                <footer className="text-center text-xs text-gray-500 mt-12 pb-6">© {new Date().getFullYear()} H‑CODE • Humor Typology</footer>
+                <footer className="text-center text-sm text-white/60 mt-12 pb-6 font-comic">
+                  Made with 💖 and lots of 😂 • © {new Date().getFullYear()} H‑CODE • Humor Typology • Keep laughing! 🎉
+                </footer>
               </div>
             </div>
           );
